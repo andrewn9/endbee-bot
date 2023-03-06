@@ -15,23 +15,31 @@ client.once('ready', () => {
   updateCommands();
 });
 
-function updateCommands() {
-  const commands = config.commands.map(command => ({
-    name: command.name,
-    description: command.description,
-    options: command.options,
-  }));
-
-  // Remove all existing global commands
-  client.application.commands.set([]).then(() => {
-    console.log('Commands cleared!');
-    // Create new global commands
-    client.application.commands
-      .set(commands)
-      .then(() => console.log('Commands updated!'))
-      .catch(console.error);
-  });
-}
+async function updateCommands() {
+    const commands = config.commands.map(command => ({
+      name: command.name,
+      description: command.description,
+      options: command.options,
+    }));
+  
+    try {
+      await client.application.commands.set([]);
+  
+      console.log('Commands cleared!');
+  
+      await client.application.commands.set(commands.map(command => ({
+        name: command.name,
+        description: command.description,
+        options: command.options,
+        defaultPermission: true,
+        type: 'CHAT_INPUT'
+      })));
+  
+      console.log('Commands updated!');
+    } catch (error) {
+      console.error(error);
+    }
+}  
 
 process.on('SIGINT', () => {
   console.log('Logging out and stopping...');
@@ -49,7 +57,7 @@ client.on('interactionCreate', async (interaction) => {
   const commandFile = require(`./commands/${command.name}.js`);
 
   try {
-    await commandFile.execute(interaction);
+    await commandFile.execute(interaction, client);
   } catch (error) {
     console.error(error);
     await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
