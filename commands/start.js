@@ -1,3 +1,9 @@
+/*
+    start.js
+    responsible for the /start command
+    creates new thread and sets up game object
+*/
+
 const { ThreadChannel } = require("discord.js");
 const Game = require("../classes/Game");
 const games = require("../classes/gamemanager");

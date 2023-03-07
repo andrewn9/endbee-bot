@@ -1,9 +1,14 @@
+/*
+    index.js
+    bot initialization and setup
+*/
+
 const { Client, Intents } = require('discord.js');
-const fs = require('fs');
-require('dotenv').config();
+const env = require('dotenv').config();
 const config = require('./config.json');
 const games = require('./classes/gamemanager.js');
 
+// Set bot intents
 const client = new Client({
   intents: [
     Intents.FLAGS.GUILDS,
@@ -11,12 +16,15 @@ const client = new Client({
   ],
 });
 
+// On startup
 client.once('ready', () => {
   console.log('Ready!');
   updateCommands();
 });
 
+// Replaces all commands to match ./commands
 async function updateCommands() {
+    // Configure command
     const commands = config.commands.map(command => ({
       name: command.name,
       description: command.description,
@@ -24,10 +32,11 @@ async function updateCommands() {
     }));
   
     try {
+      // Clear commands
       await client.application.commands.set([]);
-  
       console.log('Commands cleared!');
-  
+      
+      // Configure command
       await client.application.commands.set(commands.map(command => ({
         name: command.name,
         description: command.description,
@@ -42,21 +51,25 @@ async function updateCommands() {
     }
 }  
 
+// On termination
 process.on('SIGINT', () => {
   console.log('Logging out and stopping...');
   client.destroy();
   process.exit(0);
 });
 
+// Create interactions for command
 client.on('interactionCreate', async (interaction) => {
+  // Not a command
   if (!interaction.isCommand()) return;
 
+  // Map command with file
   const command = config.commands.find(c => c.name === interaction.commandName);
-
   if (!command) return;
 
   const commandFile = require(`./commands/${command.name}.js`);
 
+  // Initialize interaction execution
   try {
     await commandFile.execute(interaction, client);
   } catch (error) {
@@ -89,6 +102,5 @@ client.on('messageCreate', async message => {
   await game.updateCurrentWord(letter);
   game.printInfo();
 });
-
 
 client.login(process.env.TOKEN);
