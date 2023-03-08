@@ -1,5 +1,4 @@
 {
-  "prefix": "!",
   "commands": [
     {
       "name": "ping",
@@ -13,6 +12,18 @@
           "name": "user",
           "description": "The user to start a game with",
           "type": 6,
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "search",
+      "description": "Search for words beginning with the arguement",
+      "options": [
+        {  
+          "name": "query",
+          "description": "The beginning of the word",
+          "type": 3,
           "required": true
         }
       ]
