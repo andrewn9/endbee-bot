@@ -1,5 +1,6 @@
 const https = require('https');
 const env = require('dotenv').config();
+const axios = require('axios');
 
 module.exports = {
   execute: async function(interaction) {
@@ -14,25 +15,26 @@ module.exports = {
     const url = `https://api.datamuse.com/words?sp=${search}*&max=20`;
     console.log(url);
 
-    
-    https.get(url, (response) => {
-      let data = ''; 
-
-      response.on('data', (chunk) => {
-        data += chunk;
-      });
-
-      response.on('end', () => {
-        console.log(data);
-        const entries = JSON.parse(data);
+    axios.get(url)
+      .then(function (response) {
+        const entries = response.data;
         console.log(entries);
+        
+        const words = [];
+        entries.forEach(entry => {
+          words.push(entry.word);
+        });
 
         let messageContent;
         messageContent = `Words that begin exactly with '${search}':\n`;
-        messageContent += entries.join('\n');
+        messageContent += words.join('\n');
         
         interaction.reply(messageContent);
-      });
-    });
+      })
+      .catch(function (error) {
+        console.log(error);
+        interaction.reply('an error occured');
+      }
+    );
   },
 };
