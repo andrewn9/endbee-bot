@@ -87,7 +87,8 @@ client.on('messageCreate', async message => {
   const game = games.get(message.channel.id);
 
   // Ignore messages from users not in the game
-  if (!game || !game.players.find(p => p.id === message.author.id)) {
+  if (!game || game.turn.id != message.author.id) {
+    console.log("invalid player");
     return;
   }
 
@@ -98,9 +99,13 @@ client.on('messageCreate', async message => {
     return;
   }
 
-  // Update the current word and print the updated info
+  // Update the current word and turn
+  var nextTurn = game.players.indexOf(game.turn) + 1;
+  if(nextTurn > game.players.length-1)
+    nextTurn = 0;
+  game.turn = game.players[nextTurn];
+
   await game.updateCurrentWord(letter);
-  game.printInfo();
 });
 
 client.login(process.env.TOKEN);

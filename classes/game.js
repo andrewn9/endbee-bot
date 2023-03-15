@@ -4,6 +4,7 @@
     what thread, players, etc..
 */
 
+const axios = require('axios');
 class Game {
   thread;
   players;
@@ -14,10 +15,10 @@ class Game {
   constructor(thread, players) {
     this.thread = thread;
     this.players = players;
-    this.turn = 0;
+    this.turn = players[Math.round(Math.random())];
 
     this.currentWord = "";
-    this.thread.send(`word: ${this.currentWord}`).then(message => this.wordMessage = message.id);
+    this.thread.send(`word: ${this.currentWord}\nturn: ${this.turn}`).then(message => this.wordMessage = message.id);
   }
 
   printInfo() {
@@ -32,7 +33,24 @@ class Game {
     this.currentWord += letter.toLowerCase();
     if (this.wordMessage) {
       const message = await this.thread.messages.fetch(this.wordMessage);
-      message.edit(`word: ${this.currentWord}`);
+      message.edit(`word: ${this.currentWord}\nturn: ${this.turn}`);
+    }
+
+    if(this.currentWord.length > 3)
+    {
+      const url = `https://api.datamuse.com/words?sp=${this.currentWord}&max=1&md=psfd`;
+      const myThread = this.thread;
+      axios.get(url)
+        .then(function (response) {
+          const entries = response.data;
+          if (entries.length > 0 && entries[0].word == this.currentWord && entries[0].defs && entries[0].tags.indexOf("prop") == -1){
+            myThread.send(`word detected: ${entries[0].word}\ndefinitions: ${entries[0].defs[0]}`);
+          }
+        })  
+        .catch(function (error) {
+          console.log(error);
+        }
+      );
     }
   }
 }

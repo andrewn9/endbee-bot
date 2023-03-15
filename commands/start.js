@@ -44,7 +44,7 @@ module.exports = {
     games.set(thread.id, game);
 
     // start the game
-    game.printInfo();
+    //game.printInfo();
     await interaction.reply({content:`new game created!`,ephemeral: true});
   },
 };
