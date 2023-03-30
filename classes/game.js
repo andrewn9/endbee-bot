@@ -36,22 +36,31 @@ class Game {
       message.edit(`word: ${this.currentWord}\nturn: ${this.turn}`);
     }
 
-    if(this.currentWord.length > 3)
-    {
-      const url = `https://api.datamuse.com/words?sp=${this.currentWord}&max=1&md=psfd`;
-      const myThread = this.thread;
-      axios.get(url)
-        .then(function (response) {
-          const entries = response.data;
-          if (entries.length > 0 && entries[0].word == this.currentWord && entries[0].defs && entries[0].tags.indexOf("prop") == -1){
-            myThread.send(`word detected: ${entries[0].word}\ndefinitions: ${entries[0].defs[0]}`);
-          }
-        })  
-        .catch(function (error) {
-          console.log(error);
+    const url = `https://api.datamuse.com/words?sp=${this.currentWord}*&max=1&md=psfd`;
+    const myThread = this.thread;
+    const myWord = this.currentWord;
+    axios.get(url)
+      .then(function (response) {
+        const entries = response.data;
+        if
+        (
+          myWord.length > 3 &&
+          entries.length > 0 &&
+          entries[0].word == myWord
+          && entries[0].defs &&
+          entries[0].tags.indexOf("prop") == -1
+        ) 
+        {
+          myThread.send(`word detected: ${entries[0].word}\ndefinitions: ${entries[0].defs[0]}`);
         }
+        else if (entries.length == 0 || !entries[0].word.startsWith(myWord)) {
+          myThread.send(`no words found starting with: ${myWord}`);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      }
       );
-    }
   }
 }
 

@@ -5,7 +5,7 @@
 */
 
 const { ThreadChannel } = require("discord.js");
-const Game = require("../classes/Game");
+const Game = require("../classes/game");
 const games = require("../classes/gamemanager");
 
 module.exports = {

@@ -10,12 +10,7 @@ module.exports = {
       await interaction.reply('No search term was specified!');
       return;
     }
-<<<<<<< HEAD
-
-=======
     
-    //const url = `https://www.dictionaryapi.com/api/v3/references/collegiate/json/${search}?key=${apiKey}`;
->>>>>>> 373464e379d6aad428fa77f8d8c49e14076c2cf3
     const url = `https://api.datamuse.com/words?sp=${search}*&max=20`;
     console.log(url);
 
